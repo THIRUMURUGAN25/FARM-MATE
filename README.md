@@ -17,5 +17,4 @@ Use:
 
 Python
 FastAPI
-REST APIs
 SQLite database
