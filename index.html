@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmMate - AI Smart Farming Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Auth Container -->
+    <div id="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;">
+        <div class="card form-card" id="login-card" style="max-width: 400px; width: 100%; text-align: center;">
+            <div class="logo" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 24px; color: #2ecc71;">
+                <i class="fas fa-leaf"></i>
+                <h2>FarmMate</h2>
+            </div>
+            <h2>Login</h2>
+            <form id="login-form">
+                <input type="text" id="login-username" placeholder="Username" required style="margin-bottom:15px">
+                <input type="password" id="login-password" placeholder="Password" required style="margin-bottom:15px">
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <p style="margin-top:15px; font-size: 14px;">Don't have an account? <a href="#" id="show-register" style="color:#2ecc71; text-decoration:none;">Register here</a></p>
+            <p id="auth-error" style="color:#e74c3c; display:none; margin-top:10px;"></p>
+        </div>
+        
+        <div class="card form-card" id="register-card" style="display:none; max-width: 400px; width: 100%; text-align: center;">
+            <div class="logo" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 24px; color: #2ecc71;">
+                <i class="fas fa-leaf"></i>
+                <h2>FarmMate</h2>
+            </div>
+            <h2>Register</h2>
+            <form id="register-form">
+                <input type="text" id="register-username" placeholder="Username" required style="margin-bottom:15px">
+                <input type="password" id="register-password" placeholder="Password" required style="margin-bottom:15px">
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <p style="margin-top:15px; font-size: 14px;">Already have an account? <a href="#" id="show-login" style="color:#2ecc71; text-decoration:none;">Login here</a></p>
+        </div>
+    </div>
+
+    <div class="app-container" id="main-app" style="display: none;">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <h2>FarmMate</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="dashboard"><i class="fas fa-home"></i> <span class="lang" data-en="Dashboard" data-ta="முகப்பு">Dashboard</span></li>
+                <li data-target="crop-rec"><i class="fas fa-seedling"></i> <span class="lang" data-en="Crop Rec." data-ta="பயிர் பரிந்துரை">Crop Rec.</span></li>
+                <li data-target="fert-rec"><i class="fas fa-flask"></i> <span class="lang" data-en="Fertilizer" data-ta="உரம்">Fertilizer</span></li>
+                <li data-target="disease"><i class="fas fa-bug"></i> <span class="lang" data-en="Disease Detect" data-ta="நோய் கண்டறிதல்">Disease Detect</span></li>
+                <li data-target="chatbot"><i class="fas fa-robot"></i> <span class="lang" data-en="AI Agent" data-ta="ஏஐ முகவர்">AI Agent</span></li>
+                <li data-target="tasks"><i class="fas fa-check-square"></i> <span class="lang" data-en="Tasks" data-ta="பணிகள்">Tasks</span></li>
+            </ul>
+            <div class="lang-switch" style="display:flex; flex-direction:column; gap:10px;">
+                <button id="lang-toggle">English / தமிழ்</button>
+                <button onclick="window.logout()" style="background:#e74c3c; border-color:#e74c3c;">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <h1><span class="lang" data-en="Welcome to FarmMate!" data-ta="ஃபாம்மேட்டிற்கு வரவேற்கிறோம்!">Welcome to FarmMate!</span></h1>
+                <div class="weather-widget" id="weather-widget">
+                    <i class="fas fa-sun"></i>
+                    <span id="weather-temp">--°C</span> | <span id="weather-desc">Loading...</span>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="page-section active">
+                    <div class="dashboard-grid">
+                        <div class="card weather-alerts">
+                            <h3><i class="fas fa-exclamation-triangle"></i> <span class="lang" data-en="Weather Risk Alerts" data-ta="வானிலை அபாய எச்சரிக்கைகள்">Weather Risk Alerts</span></h3>
+                            <ul id="weather-alerts-list">
+                                <li>Loading alerts...</li>
+                            </ul>
+                        </div>
+                        <div class="card crop-status">
+                            <h3><i class="fas fa-chart-line"></i> <span class="lang" data-en="Crop Health & Progress" data-ta="பயிர் ஆரோக்கியம் & முன்னேற்றம்">Crop Health & Progress</span></h3>
+                            <div class="progress-container">
+                                <label>Growth Progress (Rice)</label>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 65%;">65%</div>
+                                </div>
+                            </div>
+                            <p>Expected Harvest: <strong>45 days</strong></p>
+                            <p>Health Status: <strong style="color:var(--success)">Good</strong></p>
+                        </div>
+                        <div class="card task-summary">
+                            <h3><i class="fas fa-tasks"></i> <span class="lang" data-en="Today's Tasks Summary" data-ta="இன்றைய பணிகளின் சுருக்கம்">Today's Tasks Summary</span></h3>
+                            <p>Pending: <span id="pending-count">0</span></p>
+                            <p>Completed: <span id="completed-count">0</span></p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Crop Recommendation Section -->
+                <section id="crop-rec" class="page-section">
+                    <div class="card form-card">
+                        <h2><span class="lang" data-en="Crop Recommendation" data-ta="பயிர் பரிந்துரை">Crop Recommendation</span></h2>
+                        <form id="crop-form">
+                            <input type="number" step="0.1" id="soil_ph" placeholder="Soil pH (e.g., 6.5)" required>
+                            <input type="number" step="0.1" id="temp" placeholder="Temperature (°C)" required>
+                            <input type="number" step="0.1" id="humidity" placeholder="Humidity (%)" required>
+                            <input type="number" step="0.1" id="rainfall" placeholder="Rainfall (mm)" required>
+                            <select id="soil_type" required>
+                                <option value="Clay">Clay</option>
+                                <option value="Sandy">Sandy</option>
+                                <option value="Loamy">Loamy</option>
+                            </select>
+                            <button type="submit" class="btn"><span class="lang" data-en="Get Recommendation" data-ta="பரிந்துரையைப் பெறுங்கள்">Get Recommendation</span></button>
+                        </form>
+                        <div id="crop-result" class="result-box hidden"></div>
+                    </div>
+                </section>
+
+                <!-- Fertilizer Section -->
+                <section id="fert-rec" class="page-section">
+                    <div class="card form-card">
+                        <h2><span class="lang" data-en="Fertilizer Recommendation" data-ta="உரப் பரிந்துரை">Fertilizer Recommendation</span></h2>
+                        <form id="fert-form">
+                            <input type="text" id="fert-crop" placeholder="Crop Name (e.g., Rice)" required>
+                            <input type="number" step="0.1" id="fert-ph" placeholder="Soil pH" required>
+                            <button type="submit" class="btn">Get Fertilizer</button>
+                        </form>
+                        <div id="fert-result" class="result-box hidden"></div>
+                    </div>
+                </section>
+
+                <!-- Disease Detect Section -->
+                <section id="disease" class="page-section">
+                    <div class="card form-card">
+                        <h2><span class="lang" data-en="Crop Disease Detection" data-ta="பயிர் நோய் கண்டறிதல்">Crop Disease Detection</span></h2>
+                        <form id="disease-form">
+                            <label for="leaf-img" class="file-upload">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload Leaf Image
+                            </label>
+                            <input type="file" id="leaf-img" accept="image/*" required style="display:none;">
+                            <div id="preview-container"></div>
+                            <button type="submit" class="btn" style="margin-top:10px;">Detect Disease</button>
+                        </form>
+                        <div id="disease-result" class="result-box hidden"></div>
+                    </div>
+                </section>
+
+                <!-- Chatbot Section -->
+                <section id="chatbot" class="page-section">
+                    <div class="card chat-card">
+                        <h2>🤖 FarmMate Assistant (<span id="chat-lang-indicator">EN</span>)</h2>
+                        <div class="chat-box" id="chat-box">
+                            <div class="msg bot">Hello! Ask me about crops, fertilizers, or diseases.</div>
+                        </div>
+                        <div class="chat-input-area">
+                            <button id="mic-btn" class="icon-btn"><i class="fas fa-microphone"></i></button>
+                            <input type="text" id="chat-input" placeholder="Type or speak a question...">
+                            <button id="send-btn" class="btn"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tasks Section -->
+                <section id="tasks" class="page-section">
+                    <div class="card form-card task-card">
+                        <h2>Daily Farm Activities</h2>
+                        <form id="task-form" style="flex-direction:row; align-items:center;">
+                            <input type="text" id="task-input" placeholder="Which crop do you yield? (e.g., Rice)" required style="flex-grow:1;">
+                            <button type="submit" class="btn">Generate Tasks</button>
+                        </form>
+                        <ul id="task-list" class="task-list">
+                            <!-- Tasks will render here -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script src="/static/js/app.js?v=4"></script>
+</body>
+</html>
